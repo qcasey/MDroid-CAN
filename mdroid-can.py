@@ -27,7 +27,7 @@ handlers = {
 
 # Log the decoded values to MDroid Core
 def logFrame(decodedValues):
-	for key,value in decodedValues:
+	for key,value in decodedValues.iteritems():
 		try: 
 			postingKey = key.upper().replace(" ", "_") # Format this to look consistent in Session db
 			r = requests.post(LOGGING_ADDRESS+postingKey, json={"value": str(value)}, headers={'Content-type': 'application/json', 'Accept': 'text/plain'})
