@@ -2,6 +2,7 @@ from canard import can
 from canard.hw import cantact
 import handlers
 import requests
+import logging
 
 # BE SURE TO CHANGE THESE
 # Logging address more than likely should be commented out
@@ -9,7 +10,7 @@ LOGGING_ADDRESS = "http://localhost:5353/session/" # This is where we'll log the
 dev = cantact.CantactDev("/dev/ttyACM0") # Connect to CANable that enumerated as ttyACM0
 dev.set_bitrate(500000) # Set the bitrate to a 500kbps
 dev.start() # Go on the bus
-import logging
+logging.basicConfig(level=logging.DEBUG)
 
 # Reference the handlers in handlers.py, 
 # mapping Frame IDs to a function that can decode them
