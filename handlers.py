@@ -67,17 +67,18 @@ def parseIC(data):
 	return parsed
 
 # Handles ID 1557
+# TODO
 def parseAC(data):
 	# x being temperature in Deg C,
 	#(x>=0 deg C,DEC2HEX(x),DEC2HEX(-x)+128) x range min -40 C max 50 C
-	if format(data[3], 'x') > 50:
-		temp = format(data[3], 'x')+(128)
-	else:
-		temp = format(data[3], 'x')
+	#if format(data[3], 'x') > 50:
+	#	temp = format(data[3], 'x')+(128)
+	#else:
+	#	temp = format(data[3], 'x')
 	
 	parsed = {
 		"Air Conditioning On": data[0] == 128,
-		"Outside Temp (C)": temp
+		#"Outside Temp (C)": temp
 	}
 	return parsed
 
