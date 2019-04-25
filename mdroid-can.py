@@ -10,7 +10,12 @@ LOGGING_ADDRESS = "http://localhost:5353/session/" # This is where we'll log the
 dev = cantact.CantactDev("/dev/ttyACM0") # Connect to CANable that enumerated as ttyACM0
 dev.set_bitrate(500000) # Set the bitrate to a 500kbps
 dev.start() # Go on the bus
+
+# Start logging
 logging.basicConfig(level=logging.DEBUG)
+# Make requests a little quieter
+logging.getLogger("requests").setLevel(logging.CRITICAL)
+logging.getLogger("urllib3").setLevel(logging.CRITICAL)
 
 # Reference the handlers in handlers.py, 
 # mapping Frame IDs to a function that can decode them
