@@ -39,7 +39,7 @@ def logFrame(decodedValues):
 			if r.status_code != 200:
 				logging.debug("Failed to POST data to API: "+r.reason)
 		except Exception as e:
-			logging.debug("Error when posting frame to MDroid Core: "+e)
+			logging.debug("Error when posting frame to MDroid Core: ")
 			logging.debug(e)
 
 # Decode frame
