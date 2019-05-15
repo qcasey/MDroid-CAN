@@ -20,14 +20,14 @@ logging.getLogger("urllib3").setLevel(logging.CRITICAL)
 # Reference the handlers in handlers.py, 
 # mapping Frame IDs to a function that can decode them
 handlers = {
-    339: handlers.parseASC1,
-    790: handlers.parseDME1,
-    809: handlers.parseDME2,
-    824: handlers.parseDME3,
-    1349: handlers.parseDME4,
-    1555: handlers.parseIC,
-    1557: handlers.parseAC,
-    504: handlers.parseBrakePressure
+	339: handlers.parseASC1,
+	790: handlers.parseDME1,
+	809: handlers.parseDME2,
+	824: handlers.parseDME3,
+	1349: handlers.parseDME4,
+	1555: handlers.parseIC,
+	1557: handlers.parseAC,
+	504: handlers.parseBrakePressure
 }
 
 # Log the decoded values to MDroid Core
@@ -40,27 +40,28 @@ def logFrame(decodedValues):
 				logging.debug("Failed to POST data to API: "+r.reason)
 		except Exception as e:
 			logging.debug("Error when posting frame to MDroid Core: "+e)
+			logging.debug(e)
 
 # Decode frame
 def getFrame():
-    frame = dev.recv() # Receive a CAN frame
-    #dev.send(frame) # Echo the CAN frame back out on the bus
-    return [frame.id, frame.data]
+	frame = dev.recv() # Receive a CAN frame
+	#dev.send(frame) # Echo the CAN frame back out on the bus
+	return [frame.id, frame.data]
 
 if __name__ == "__main__":
-    count = 0
+	count = 0
 
-    while True:
-        count += 1
-        id, data = getFrame()
-        logging.info(str(id)+" ("+str(hex(id))+"): "+str(data))
+	while True:
+		count += 1
+		id, data = getFrame()
+		logging.info(str(id)+" ("+str(hex(id))+"): "+str(data))
 
-        if id in handlers:
+		if id in handlers:
 			decodedValues = handlers[id](data)
 			logging.info(decodedValues)
 			if LOGGING_ADDRESS: 
 				logFrame(decodedValues)
-        else:
+		else:
 			logging.debug("Unknown ID "+str(id)+" ("+str(hex(id))+")")
 
-        print('\n')
+		print('\n')
