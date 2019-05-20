@@ -9,12 +9,13 @@ def parseASC1(data):
 	# Bit length of 12, discard last 4 bits of LSB
 	# Gain of 1/8, so 0x0008 is 1kmph
 	speed = (.125 * int(str(format(data[2], 'x')) + str(format(data[1], 'x'))[0], 16))
-	
+	#speed = .125* bin(int(data[2],2) + int(data[1],2))
+	#speed = int(data[2],16) + int(data[1],16)
+
 	# speed is weird, in that it's only valid above 0.5kmph.
 	if speed <= 0.5:
 		speed = 0
-	else:
-		speed = 1.609
+
 	return {"Speed": speed}
 
 # Handles ID 790
