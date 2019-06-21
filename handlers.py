@@ -55,13 +55,16 @@ def parseDME4(data):
 
 # Handles ID 1555
 def parseIC(data):
+	# Convert int to hex and back again
+	fuelData = int(str(data[2]), 16)
+
 	# Fuel level will parse to be a float between 0 and 1
-	if data[2] == 128: #hex 80 is empty
+	if fuelData == 128: #hex 80 is empty
 		fuelLevel = 0
-	elif data[2] <= 135 and data[2] > 128:
-		fuelLevel = (data[2]-128)/64
+	elif fuelData <= 135 and fuelData > 128:
+		fuelLevel = (fuelData-128)/64
 	else: # between 0 and 57, add another 7 to account for rollover
-		fuelLevel = (data[2]+7)/64
+		fuelLevel = (fuelData+7)/64
 	
 	parsed = {
 		"Odometer": (int(str(format(data[1], 'x')) + str(format(data[0], 'x')), 16)*10) / 1.609,
