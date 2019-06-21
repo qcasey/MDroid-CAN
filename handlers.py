@@ -9,8 +9,6 @@ def parseASC1(data):
 	# Bit length of 12, discard last 4 bits of LSB
 	# Gain of 1/8, so 0x0008 is 1kmph
 	speed = (.125 * int(str(format(data[2], 'x')) + str(format(data[1], 'x'))[0], 16))
-	#speed = .125* bin(int(data[2],2) + int(data[1],2))
-	#speed = int(data[2],16) + int(data[1],16)
 
 	# speed is weird, in that it's only valid above 0.5kmph.
 	if speed <= 0.5:
@@ -21,7 +19,12 @@ def parseASC1(data):
 # Handles ID 790
 def parseDME1(data):
 	rpm = int(str(format(data[3], 'x')) + str(format(data[2], 'x')), 16)/6.4
-	return {"RPM": rpm}
+
+	# Randomly jumps down to < 120-300 RPM for some reason, I suspect different data is being sent
+	if rpm > 500:
+		return {"RPM": rpm}
+	else:
+		return None
 
 # Handles ID 809
 def parseDME2(data):
