@@ -36,7 +36,7 @@ def parseConfig():
 
 	# parse program arguments
 	parser = argparse.ArgumentParser(description='Read from BMW E46 CAN Bus, forward to REST API.')
-	parser.add_argument('--settings', action='store', required=True, help='Config file to load Device and API settings.')
+	parser.add_argument('--settings-file', action='store', required=True, help='Config file to load Device and API settings.')
 	args  = parser.parse_args()
 
 	# Overwrite defaults if settings file is provided
