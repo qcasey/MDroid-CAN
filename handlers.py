@@ -3,6 +3,8 @@
 ## Small functions to parse a frame's data into usable information
 ##
 
+def hex2dec(integer): return int(str(integer), 16)
+
 # Handles ID 339
 def parseASC1(data):
 	# Speed is MSB+LSB
@@ -18,7 +20,7 @@ def parseASC1(data):
 
 # Handles ID 790
 def parseDME1(data):
-	rpm = int(str(format(data[3], 'x')) + str(format(data[2], 'x')), 16)/6.4
+	rpm = round ( int(str(format(data[3], 'x')) + str(format(data[2], 'x')), 16)/6.4, 2) 
 
 	# Randomly jumps down to < 120-300 RPM for some reason, I suspect different data is being sent
 	if rpm > 500:
@@ -29,7 +31,7 @@ def parseDME1(data):
 # Handles ID 809
 def parseDME2(data):
 	parsed = {
-		"Temp C": data[1]-48.373,
+		"Temp C": ( (0.75) * hex2dec(data[1]) )-48.373,
 		"Cruise Control": bin(data[3])[-1] == 1, # 1 or 0 in bit 7 of byte 3
 		"Throttle Position": data[5],
 		"Kickdown Switch": data[6] == 4,
@@ -49,14 +51,14 @@ def parseDME3(data):
 # TODO
 def parseDME4(data):
 	parsed = {
-		"Oil Temp": round(data[4]-48.373, 3)
+		"Oil Temp": round(hex2dec(data[4])-48.373, 2)
 	}
 	return parsed
 
 # Handles ID 1555
 def parseIC(data):
 	# Convert int to hex and back again
-	fuelData = int(str(data[2]), 16)
+	fuelData = hex2dec(data[2])
 
 	# Fuel level will parse to be a float between 0 and 1
 	if fuelData == 128: #hex 80 is empty
@@ -84,7 +86,7 @@ def parseAC(data):
 	#	temp = format(data[3], 'x')
 	
 	parsed = {
-		"Air Conditioning On": data[0] == 128,
+		"Air Conditioning On": data[0] == 80,
 		#"Outside Temp (C)": temp
 	}
 	return parsed
