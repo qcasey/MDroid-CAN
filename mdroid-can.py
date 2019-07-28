@@ -45,16 +45,16 @@ def parseConfig():
 			try:
 				with open(args.settings_file) as json_file:
 					data = json.load(json_file)
-					if "CONFIG" in data:
+					if "MDROID" in data:
 						# Setup MDroid API
-						if "MDROID_HOST" in data["CONFIG"]:
-							LOGGING_ADDRESS = data["CONFIG"]["MDROID_HOST"]
+						if "MDROID_HOST" in data["MDROID"]:
+							LOGGING_ADDRESS = data["MDROID"]["MDROID_HOST"]
 						else:
 							logging.debug("MDROID_HOST not found in config file, not using MDroid API.")
 
 					# Setup device
-					if "CAN_DEVICE" in data["CONFIG"]:
-						DEVICE = data["CONFIG"]["CAN_DEVICE"]
+					if "CAN_DEVICE" in data["MDROID"]:
+						DEVICE = data["MDROID"]["CAN_DEVICE"]
 					else: 
 						logging.debug("CAN_DEVICE not found in config file, using defaults.")
 
