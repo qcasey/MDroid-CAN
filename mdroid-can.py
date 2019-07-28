@@ -36,14 +36,14 @@ def parseConfig():
 
 	# parse program arguments
 	parser = argparse.ArgumentParser(description='Read from BMW E46 CAN Bus, forward to REST API.')
-	parser.add_argument('--settings-file', action='store', required=True, help='Config file to load Device and API settings.')
+	parser.add_argument('--settings-file', action='store', help='Config file to load Device and API settings.')
 	args  = parser.parse_args()
 
 	# Overwrite defaults if settings file is provided
-	if args.settings:
-		if os.path.isfile(args.settings): 
+	if args and "settings_file" in args:
+		if os.path.isfile(args.settings_file): 
 			try:
-				with open(args.settings) as json_file:
+				with open(args.settings_file) as json_file:
 					data = json.load(json_file)
 					if "CONFIG" in data:
 						# Setup MDroid API
@@ -59,10 +59,10 @@ def parseConfig():
 						logging.debug("CAN_DEVICE not found in config file, using defaults.")
 
 			except IOError as e:
-				logging.error("Failed to open settings file:"+args.settings)
+				logging.error("Failed to open settings_file file:"+args.settings_file)
 				logging.error(e)
 		else:
-			logging.error("Could not load settings from file"+str(args.settings))
+			logging.error("Could not load settings_file from file"+str(args.settings_file))
 
 # Log the decoded values to MDroid Core
 def logFrame(decodedValues):
@@ -87,7 +87,8 @@ if __name__ == "__main__":
 	dev = cantact.CantactDev(DEVICE) # Connect to CANable that enumerated as ttyACM0
 	dev.set_bitrate(500000) # Set the bitrate to a 500kbps
 	dev.start() # Go on the bus
-
+	logging.info("Starting CANBUS watch")
+	
 	while True:
 		id, data = getFrame()
 		logging.info(str(id)+" ("+str(hex(id))+"): "+str(data))
