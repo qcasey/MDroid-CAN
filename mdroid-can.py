@@ -1,5 +1,6 @@
 from canard import can
 from canard.hw import cantact
+import mdroidconfig
 import handlers
 import requests
 import logging
@@ -31,39 +32,6 @@ handlers = {
 	504: handlers.parseBrakePressure
 }
 
-def parseConfig():
-	global LOGGING_ADDRESS, DEVICE
-
-	# parse program arguments
-	parser = argparse.ArgumentParser(description='Read from BMW E46 CAN Bus, forward to REST API.')
-	parser.add_argument('--settings-file', action='store', help='Config file to load Device and API settings.')
-	args  = parser.parse_args()
-
-	# Overwrite defaults if settings file is provided
-	if args and "settings_file" in args:
-		if os.path.isfile(args.settings_file): 
-			try:
-				with open(args.settings_file) as json_file:
-					data = json.load(json_file)
-					if "MDROID" in data:
-						# Setup MDroid API
-						if "MDROID_HOST" in data["MDROID"]:
-							LOGGING_ADDRESS = data["MDROID"]["MDROID_HOST"]
-						else:
-							logging.debug("MDROID_HOST not found in config file, not using MDroid API.")
-
-					# Setup device
-					if "CAN_DEVICE" in data["MDROID"]:
-						DEVICE = data["MDROID"]["CAN_DEVICE"]
-					else: 
-						logging.debug("CAN_DEVICE not found in config file, using defaults.")
-
-			except IOError as e:
-				logging.error("Failed to open settings_file file:"+args.settings_file)
-				logging.error(e)
-		else:
-			logging.error("Could not load settings_file from file"+str(args.settings_file))
-
 # Log the decoded values to MDroid Core
 def logFrame(decodedValues):
 	for key,value in decodedValues.iteritems():
@@ -83,7 +51,13 @@ def getFrame():
 	return [frame.id, frame.data]
 
 if __name__ == "__main__":
-	parseConfig() # overwrite defaults if necessary
+	# Read shared config file first
+	config = mdroidconfig.readConfig({"MDROID": {"MDROID_HOST", "CAN_DEVICE"}})
+	if config is None:
+		exit("Failed to parse config.")
+	LOGGING_ADDRESS = config["MDROID"]["MDROID_HOST"]
+	DEVICE = config["MDROID"]["CAN_DEVICE"]
+
 	dev = cantact.CantactDev(DEVICE) # Connect to CANable that enumerated as ttyACM0
 	dev.set_bitrate(500000) # Set the bitrate to a 500kbps
 	dev.start() # Go on the bus
