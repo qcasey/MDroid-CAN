@@ -1,5 +1,6 @@
-from canard import can
-from canard.hw import cantact
+#from canard import can
+#from canard.hw import cantact
+import can
 import mdroidconfig
 import handlers
 import requests
@@ -11,10 +12,10 @@ import json
 # BE SURE TO CHANGE THESE
 # Logging address more than likely should be commented out
 LOGGING_ADDRESS = "http://localhost:5353/session/" # This is where we'll log the data with a RESTful post
-DEVICE = "/dev/ttyACM0"
+#DEVICE = "/dev/ttyACM0"
 
 # Start logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 # Make requests a little quieter
 logging.getLogger("requests").setLevel(logging.CRITICAL)
 logging.getLogger("urllib3").setLevel(logging.CRITICAL)
@@ -47,28 +48,32 @@ def logFrame(decodedValues):
 # Decode frame
 def getFrame():
 	frame = dev.recv() # Receive a CAN frame
+	#print(frame)
 	#dev.send(frame) # Echo the CAN frame back out on the bus
-	return [frame.id, frame.data]
+	return [frame.arbitration_id, frame.data]
 
 if __name__ == "__main__":
 	# Read shared config file first
-	config = mdroidconfig.readConfig({"MDROID": {"MDROID_HOST", "CAN_DEVICE"}})
-	if config is None:
-		exit("Failed to parse config.")
-	LOGGING_ADDRESS = config["MDROID"]["MDROID_HOST"]
-	DEVICE = config["MDROID"]["CAN_DEVICE"]
-
-	dev = cantact.CantactDev(DEVICE) # Connect to CANable that enumerated as ttyACM0
-	dev.set_bitrate(500000) # Set the bitrate to a 500kbps
-	dev.start() # Go on the bus
+	#config = mdroidconfig.readConfig({"MDROID": {"MDROID_HOST", "CAN_DEVICE"}})
+	#if config is None:
+	#	exit("Failed to parse config.")
+	#LOGGING_ADDRESS = config["MDROID"]["MDROID_HOST"]
+	#LOGGING_ADDRESS = None
+	#DEVICE = "/dev/ttyUSB1" #config["MDROID"]["CAN_DEVICE"]
+	
+	dev = can.interface.Bus(bustype='socketcan', channel='can0', bitrate=500000)
+	#dev = cantact.CantactDev(DEVICE) # Connect to CANable that enumerated as ttyACM0
+	#dev.set_bitrate(500000) # Set the bitrate to a 500kbps
+	#dev.start() # Go on the bus
 	logging.info("Starting CANBUS watch")
 	
 	while True:
 		id, data = getFrame()
-		logging.info(str(id)+" ("+str(hex(id))+"): "+str(data))
+		#logging.info("Data: "+str(list(data)))
+		logging.info(str(id)+" ("+str(hex(id))+"): "+str(list(data)))
 
 		if id in handlers:
-			decodedValues = handlers[id](data)
+			decodedValues = handlers[id](list(data))
 			logging.info(decodedValues)
 			if LOGGING_ADDRESS and decodedValues: 
 				logFrame(decodedValues)
